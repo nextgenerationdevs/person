@@ -68,18 +68,15 @@ function createRequest() {
 document.getElementById("create").onclick = function create() {
     if (checkInputs() != true)
         return;
-    xmlHttpRequest.open("POST", "/server.php", true);
+    xmlHttpRequest.open("POST", "/person/server.php", true);
     xmlHttpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
     xmlHttpRequest.onreadystatechange = createReply;
-    xmlHttpRequest.send(createRequest());
+    xmlHttpRequest.send(createRequest() + "&func=create");
 }
 function createReply() {
     if (xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 200) {
         var response = xmlHttpRequest.responseText;
-        if (response == 'id_exist') {
-            alert('Введённый id уже существует, данный параметр должен быть уникальным!');
-        }
-        else if (response == 'success') {
+         if (response == 'success') {
             alert('Процесс создания персоны прошёл успешно!');
             clearInputs();
             read();
@@ -94,10 +91,10 @@ function createReply() {
 document.getElementById("update").onclick = function update() {
     if (checkInputs() != true)
         return;
-    xmlHttpRequest.open("POST", "/server_UpdatePersonAsync.php", true);
+    xmlHttpRequest.open("POST", "/person/server.php", true);
     xmlHttpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
     xmlHttpRequest.onreadystatechange = updateReply;
-    xmlHttpRequest.send(createRequest());
+    xmlHttpRequest.send(createRequest() + "&func=update");
 }
 function updateReply() {
     if (xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 200) {
@@ -120,10 +117,10 @@ function updateReply() {
 document.getElementById("delete").onclick = function remove() {
     if (checkInputs() != true)
         return;
-    xmlHttpRequest.open("POST", "/server.php", true);
+    xmlHttpRequest.open("POST", "/person/server.php", true);
     xmlHttpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
     xmlHttpRequest.onreadystatechange = removeReply;
-    xmlHttpRequest.send(createRequest());
+    xmlHttpRequest.send(createRequest() + "&func=delete");
 }
 function removeReply() {
     if (xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 200) {
@@ -144,8 +141,7 @@ function removeReply() {
 
 //функция асинхронного get запроса на сервер
 function read() {
-    xmlHttpRequest.open('POST', "/server.php", true);
-    xmlHttpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+    xmlHttpRequest.open('GET', "/person/server.php?func=read", true);
     xmlHttpRequest.onreadystatechange = readReply;
     xmlHttpRequest.send();
 }
