@@ -3,6 +3,11 @@ var id = document.getElementById("IDn");
 var fname = document.getElementById("Fname");
 var lname = document.getElementById("Lname");
 var age = document.getElementById("Age");
+//инициализация полей таблицы
+var myHeader = document.getElementById("myHeader");
+var myCaption = document.getElementById("myCaption").innerHTML = "ТАБЛИЦА ПЕРСОН";
+var myTable = document.getElementById("myTable");
+var tableModel = null;
 
 //инициализация xmlHttpRequest
 var xmlHttpRequest = xmlHttpRequest();
@@ -145,14 +150,112 @@ function read() {
     xmlHttpRequest.onreadystatechange = readReply;
     xmlHttpRequest.send();
 }
+
 function readReply() {
     if (xmlHttpRequest.readyState == 4 && xmlHttpRequest.status == 200) {
         var response = xmlHttpRequest.responseText;
+        clearTable();
         if (response == '0') {
             alert('База пуста! Необходимо создать хотя-бы одну персону для отображения!');
         }
         else {
             alert('А здесь идёт логика перерисовки таблицы данных!');
+            if (response == "") {
+                alert("Некорректный массив данных!");
+            }
+            else {
+                if (tableModel == null) {
+                    tableModel = new TableModel(response);
+                }
+                else {
+                    tableModel.setData(response);
+                }
+                updateTable(tableModel);
+            }
         }
     }
+}
+
+//очистка таблицы перед заполнением
+function clearTable() {
+    //очистка заголовков
+    while (myHeader.rows.length != 0) {
+        myHeader.deleteRow(-1);
+    }
+    //очистка данных
+    while (myTable.rows.length != 0) {
+        myTable.deleteRow(-1);
+    }
+}
+
+//класс формирования данных таблицы
+var TableModel = function (data) {
+    this.data = JSON.parse(data);
+
+    this.columnCount = function() {
+        if (this.data.length == 0) {
+            alert("Некорректный массив данных!");
+            return 0;
+        }
+        else {
+            return Object.keys(this.data[0]).length;
+        }
+    }
+
+    this.rowCount = function () {
+        if (this.data.length == 0) {
+            alert("Некорректный массив данных!");
+            return 0;
+        }
+        else {
+            return this.data.length;
+        }
+    }
+
+    this.getValueAt = function(row, column) {
+        if (this.data.length == 0) {
+            alert("Некорректный массив данных!");
+            return null;
+        }
+        else {
+            var p = this.data[row];
+            var propertyName = Object.keys(p)[column];
+            return p[propertyName];
+        }
+    }
+
+    this.columnName = function() {
+        if (this.data.length == 0) {
+            alert("Некорректный массив данных!");
+            return 0;
+        }
+        else {
+            return Object.keys(this.data[0]);
+        }
+    }
+
+    this.setData = function(data) {
+        this.data = JSON.parse(data);
+    }
+}
+
+//перерисовка таблицы
+function updateTable(tableModel) {
+
+    var headerRow = myHeader.insertRow();
+    for (var i = 0; i < tableModel.columnCount(); i++) {
+        var cell = headerRow.insertCell(i);
+        cell.innerHTML = "<b>" + tableModel.columnName()[i]+ "</b>";
+    }
+    for (var i = 0; i < tableModel.rowCount(); i++) {
+        var row = myTable.insertRow(i);
+        for (var j = 0; j < tableModel.columnCount(); j++) {
+            var cell = row.insertCell(j);
+            cell.innerHTML = tableModel.getValueAt(i, j);
+        }
+    }
+}
+
+window.onload = function(){
+    read();
 }

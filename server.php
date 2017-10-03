@@ -3,12 +3,17 @@ session_start();
 include ('dbconnect.php');
 
 //инициализация полей для приёма данных персоны
-$id = $_POST['id'];
-$fname = $_POST['fname'];
-$lname = $_POST['lname'];
-$age = $_POST['age'];
+if (isset($_POST['func'])) {
+    $func = $_POST['func'];
+    $id = $_POST['id'];
+    $fname = $_POST['fname'];
+    $lname = $_POST['lname'];
+    $age = $_POST['age'];
+}
+elseif (isset($_GET['func'])) {
+    $func = $_GET['func'];
+}
 
-$func = $_POST['func'];
 
     switch ($func) {
         case 'create':
@@ -30,7 +35,7 @@ $func = $_POST['func'];
         case 'delete':
 
             $query = ' DELETE FROM `person` WHERE `id` = "'.$id.'" ';
-            if(mysqli_query($connection, $query)){
+            if(!mysqli_query($connection, $query)){
                 echo 'id_not_exist';
             }else {
                 echo 'success';
